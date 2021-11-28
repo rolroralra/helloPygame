@@ -22,7 +22,7 @@ class Pointer(pygame.sprite.Sprite):
 
 # Map
 def setup():
-    global map
+    global bubble_map
     map = [
         list("RRYYBBGG"),
         list("RRYYBBG/"),
@@ -103,7 +103,7 @@ pointer = Pointer(pointer_image, (screen_width // 2, 624))
 CELL_SIZE = 54
 BUBBLE_WIDTH = 54
 BUBBLE_HEIGHT = 62
-map = []
+bubble_map = []
 bubble_group = pygame.sprite.Group()
 
 

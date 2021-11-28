@@ -13,7 +13,7 @@ class Bubble(pygame.sprite.Sprite):
 
 # Map
 def setup():
-    global map
+    global bubble_map
     map = [
         list("RRYYBBGG"),
         list("RRYYBBG/"),
@@ -89,7 +89,7 @@ bubble_images = [
 CELL_SIZE = 54
 BUBBLE_WIDTH = 54
 BUBBLE_HEIGHT = 62
-map = []
+bubble_map = []
 bubble_group = pygame.sprite.Group()
 
 

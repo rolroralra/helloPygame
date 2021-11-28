@@ -37,7 +37,7 @@ class Pointer(pygame.sprite.Sprite):
 
 # Map
 def setup():
-    global map
+    global bubble_map
     map = [
         list("RRYYBBGG"),
         list("RRYYBBG/"),
@@ -123,7 +123,7 @@ to_angle_left = 0
 to_angle_right = 0
 angle_speed = 1.5
 
-map = []
+bubble_map = []
 bubble_group = pygame.sprite.Group()
 
 
