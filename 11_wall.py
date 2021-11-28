@@ -44,6 +44,10 @@ class Bubble(pygame.sprite.Sprite):
         self.row_idx = row_idx
         self.col_idx = col_idx
 
+    def drop_downward(self, height):
+        self.rect = self.image.get_rect(center=(self.rect.centerx, self.rect.centery + height))
+
+
 class Pointer(pygame.sprite.Sprite):
     def __init__(self, image, position, angle):
         super().__init__()
@@ -110,8 +114,9 @@ def setup():
 
 
 def get_bubble_position(row_idx, col_idx):
+    global wall_height
     pos_x = col_idx * CELL_SIZE + (BUBBLE_WIDTH // 2)
-    pos_y = row_idx * CELL_SIZE + (BUBBLE_HEIGHT // 2)
+    pos_y = row_idx * CELL_SIZE + (BUBBLE_HEIGHT // 2) + wall_height
 
     if row_idx % 2 == 1:
         pos_x += CELL_SIZE // 2
@@ -163,11 +168,11 @@ def get_random_bubble_color():
 
 
 def process_collision():
-    global current_bubble, bubble_group, is_fire, current_fire_count
+    global current_bubble, bubble_group, is_fire, current_fire_count, wall_height
 
     is_hit_bubble = pygame.sprite.spritecollideany(current_bubble, bubble_group, pygame.sprite.collide_mask)
 
-    if is_hit_bubble or current_bubble.rect.top <= 0:
+    if is_hit_bubble or current_bubble.rect.top <= wall_height:
         row_idx, col_idx = get_map_index(*current_bubble.rect.center)   # Tupple (x,y)
         place_bubble(current_bubble, row_idx, col_idx)
         remove_adjacent_bubbles(row_idx, col_idx, current_bubble.color)
@@ -177,7 +182,8 @@ def process_collision():
 
 
 def get_map_index(x, y):
-    row_idx = y // CELL_SIZE
+    global wall_height
+    row_idx = (y - wall_height) // CELL_SIZE
     col_idx = x // CELL_SIZE
 
     if row_idx % 2 == 1:
@@ -282,6 +288,16 @@ def draw_bubbles():
         bubble.draw(screen, to_x)
 
 
+def drop_wall():
+    global wall_height, bubble_group, current_fire_count
+    wall_height += CELL_SIZE
+
+    for bubble in bubble_group:
+        bubble.drop_downward(CELL_SIZE)
+
+    current_fire_count = FIRE_COUNT
+
+
 #######################################################################
 
 pygame.init()
@@ -295,6 +311,8 @@ clock = pygame.time.Clock()
 # Background Image Load
 current_path = os.path.dirname(__file__)
 background = pygame.image.load(os.path.join(current_path, "resource/background/background.png"))
+wall = pygame.image.load(os.path.join(current_path, "resource/wall/wall.png"))
+
 
 # Bubble Images Load
 bubble_images = [
@@ -329,6 +347,7 @@ current_bubble = None
 next_bubble = None
 is_fire = False
 current_fire_count = FIRE_COUNT
+wall_height = 0
 
 bubble_map = []
 bubble_group = pygame.sprite.Group()
@@ -372,16 +391,22 @@ while running:
     if is_fire:
         process_collision()     # 충돌 처리
 
-    # Print
-    screen.blit(background, (0, 0))
-    # bubble_group.draw(screen)
-    draw_bubbles()
+    if current_fire_count == 0:
+        drop_wall()
 
-    pointer.rotate(to_angle_left + to_angle_right)
-    pointer.draw(screen)
+    # Print
+    screen.blit(background, (0, 0))                         # Background Print
+    screen.blit(wall, (0, wall_height - screen_height))     # Wall Print
+
+    draw_bubbles()                                          # Bubbles Sprite Group Print
+
+    pointer.rotate(to_angle_left + to_angle_right)          # Pointer Angle Rotate
+    pointer.draw(screen)                                    # Pointer Print
+
     if current_bubble:
         if is_fire:
             current_bubble.move()
+
         current_bubble.draw(screen)
 
         # if current_bubble.rect.top <= 0:
