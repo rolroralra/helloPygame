@@ -64,3 +64,12 @@ pygame.quit()
 ```
   </p>
 </details>
+
+---
+## How to build by pyinstaller
+```bash
+$ pip install pyinstaller
+
+# Windows
+$ pyinstaller -w --add-data './resource:resource' -F 12_game_over.py
+```
